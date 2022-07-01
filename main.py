@@ -3,8 +3,6 @@ from tracemalloc import start
 import pygame
 import sys
 
-import pygments
-
 WIDTH = 700
 HEIGHT = 700
 
@@ -58,7 +56,9 @@ for i in range(COLUMNS):
     for j in range(ROWS):
         grid[i][j].set_neighbours()
 
-start_box = grid[0][0]
+r, c = [int(e) for e in input("Enter start coordinates: ").split()]
+
+start_box = grid[r][c]
 start_box.isstart = True
 start_box.visited = True
 queue.append(start_box)
