@@ -1,12 +1,13 @@
 from tkinter import messagebox, Tk
-from tracemalloc import start
 import pygame
 import sys
+import time
 
 WIDTH = 700
 HEIGHT = 700
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption('Pathfinding Visualizer')
 
 
 COLUMNS = 35
@@ -62,7 +63,9 @@ begin_search = False
 target_set = False
 start_set = False
 searching = True
-target_b = None
+# target_b = None
+path_found = False
+displayed_success = False
 
 
 while True:
@@ -105,9 +108,9 @@ while True:
                 grid[i][j].iswall = True
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_s:
+            if event.key == pygame.K_s and not start_set:
                 choosing_start = True
-            elif event.key == pygame.K_e:
+            elif event.key == pygame.K_e and not target_set:
                 choosing_end = True
             elif event.key == pygame.K_SPACE:
                 if target_set and start_set:
@@ -119,7 +122,9 @@ while True:
                 target_set = False
                 start_set = False
                 searching = True
-                target_b = None
+                displayed_success = False
+                # path_found = False
+                # target_b = None
                 for row in grid:
                     for box in row:
                         box.isstart = False
@@ -136,6 +141,7 @@ while True:
             current = queue.pop(0)
             current.visited = True
             if current == target:
+                path_found = True
                 searching = False
                 while current.prior != start_box:
                     path.append(current.prior)
@@ -155,6 +161,22 @@ while True:
 
     window.fill((60, 60, 60))
 
+    # if path_found:
+    #     time.sleep(1)
+    #     for i in range(COLUMNS):
+    #         for j in range(ROWS):
+    #             if grid[i][j].isstart:
+    #                 grid[i][j].draw(window, (0, 150, 200))
+    #             elif grid[i][j].iswall:
+    #                 grid[i][j].draw(window, (0, 0, 0))
+    #             elif grid[i][j].isend:
+    #                 grid[i][j].draw(window, (20, 250, 20))
+    #             elif grid[i][j] in path:
+    #                 grid[i][j].draw(window, (100, 200, 100))
+    #             else: 
+    #                 grid[i][j].draw(window, (30, 30, 30))
+
+    # else:
     for i in range(COLUMNS):
         for j in range(ROWS):
             if grid[i][j].isstart:
@@ -173,3 +195,9 @@ while True:
                 grid[i][j].draw(window, (30, 30, 30))
 
     pygame.display.flip()
+
+    if path_found and not displayed_success:
+        Tk().wm_withdraw()
+        messagebox.showinfo("Soultion Found",f"Number of steps from Start to Target: {len(path)}")
+        displayed_success = True
+
